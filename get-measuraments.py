@@ -182,10 +182,13 @@ def click_event(event:np.intc, x:np.intc, y:np.intc, flags, params)->None:
 
     if event == cv2.EVENT_MBUTTONDOWN:
         middle_button_pressed = True  
-        if len(points_real) > 1:  
+        if len(points_real) > 1 and len(points_real) != 2:  
             perimeter = compute_line_segments(points_real)
             print(f"The perimeter of the figure is: {perimeter}")
-
+        if len(points_real) == 2:
+            perimeter = compute_line_segments(points_real)
+            perimeter = perimeter / 2
+            print(f"The perimeter of the figure is: {perimeter}")
 
     if event == cv2.EVENT_LBUTTONDOWN:
         if middle_button_pressed:  
