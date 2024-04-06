@@ -5,6 +5,7 @@ Description: This script performs a measuerment of a selected points, also calib
 
 Author: Victor Santiago Solis Garcia
 Creation date: 04/05/2024
+Last update: 
 
 Usage example:  python get-measuraments.py --cal_file calibration_data.json --cam_index 0 --Z 143
 
@@ -29,7 +30,6 @@ from numpy.typing import NDArray
 
 '''
 Define global variables
-points()
 '''
 points:NDArray = [] 
 frame:NDArray = None
@@ -53,7 +53,7 @@ def load_calibration(calibration_data:str)->NDArray:
         data = json.load(f)
     return data
 
-def undistort_frame(frame:NDArray, camera_matrix:NDArray, dist_coeffs:NDArray):
+def undistort_image(frame:NDArray, camera_matrix:NDArray, dist_coeffs:NDArray):
     '''
     Function to undistord the video frames
     Parameters:    calibration_data(str): .json file
@@ -128,7 +128,7 @@ def calculate_real_coord(data:NDArray,X:np.intc,Y:np.intc,Z)->None:
     print(f"3D point coordinate X:{X_real}, Y:{Y_real}, Z:{Z}\n")
     points_real.append((X_real,Y_real))
 
-def computer_perimeter(points_real:NDArray)->float:
+def compute_line_segments(points_real:NDArray)->float:
     '''
     Function to load calculate the distance between the differents points and 
     order them in ascending order.
@@ -183,7 +183,7 @@ def click_event(event:np.intc, x:np.intc, y:np.intc, flags, params)->None:
     if event == cv2.EVENT_MBUTTONDOWN:
         middle_button_pressed = True  
         if len(points_real) > 1:  
-            perimeter = computer_perimeter(points_real)
+            perimeter = compute_line_segments(points_real)
             print(f"The perimeter of the figure is: {perimeter}")
 
 
@@ -203,7 +203,7 @@ def click_event(event:np.intc, x:np.intc, y:np.intc, flags, params)->None:
             cv2.line(frame, points[-2], points[-1], (255, 0, 0), 2)
         
         if len(points) > 1:
-            perimeter = computer_perimeter(points_real)
+            perimeter = compute_line_segments(points_real)
 
 def open_camera(data:NDArray,index:np.intc)->None:
     '''
@@ -229,7 +229,7 @@ def open_camera(data:NDArray,index:np.intc)->None:
 
         while True:
             ret, frame = cap.read()
-            frame = undistort_frame(frame, camera_matrix, dist_coeffs)
+            frame = undistort_image(frame, camera_matrix, dist_coeffs)
 
             for pt in points: 
                 cv2.circle(frame, pt, 3, (0, 0, 255), -1)
